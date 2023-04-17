@@ -1,5 +1,5 @@
 # The next word predictor
-Inspired by the iPhone word predictor I decided to recreate such a language model.
+Inspired by the iPhone word predictor I am trying to recreate such a language model.
 ![inspiration](images/iphone-texting-support.jpg)
 
 ## Dataset
