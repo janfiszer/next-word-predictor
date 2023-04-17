@@ -2,9 +2,11 @@ import numpy as np
 from collections import Counter
 
 class DataGenerator():
-    def __init__(self, tokenized_documents):
+    def __init__(self, tokenized_documents, vocabulary=None):
         self.documents = tokenized_documents
-
+        
+        if vocabulary is not None:
+            self.vocabulary = vocabulary
 
     def create_vocabulary(self, min_count=1, extra_tokens=[]) -> list:
         """ Return and creates an attribute vocabulary, which is a list of unique words that occur in the documents.
@@ -23,6 +25,7 @@ class DataGenerator():
 
         self.vocabulary = vocabulary
     
+    
     def create_dataset(self, previous_words_considered=3):
         """ Returns tuple with two lists. First words (previous_words_considered determine how many) and in the second the following word
         """
@@ -38,14 +41,18 @@ class DataGenerator():
 
                 # only from token in vocabulary
                 if y in self.vocabulary:
-                    if all(xx in self.vocabulary for xx in x):
+                    if self.belong_to_vocabulary(x) is None:
                         X_words.append(tokenized_review[index-previous_words_considered: index])
                         y_words.append(tokenized_review[index])
 
+                    # TODO: do the exception!
+                    # else:
+                    #     raise 
+
         return (X_words, y_words)
     
+
     def vectorize(self, X_words, y_words, word_vectorizer, input_size):
-        label_to_index = {word: index for index, word in enumerate(self.vocabulary)}
         
         X = np.zeros((len(X_words), input_size))
 
@@ -56,10 +63,13 @@ class DataGenerator():
 
             X[index, ...]  = numpy_x
 
-        y = np.zeros((len(y_words), len(self.vocabulary)))
-
-        for index, label in enumerate(y_words):
-            y[index, label_to_index[label]] += 1
-
-        return X, y
+        return X
             
+    def belong_to_vocabulary(self, tokens: list):
+        """ Returns the first not belonging token in the vocabulary
+        """
+        for token in tokens:
+            if not token in self.vocabulary:
+                return token
+            
+        return None
