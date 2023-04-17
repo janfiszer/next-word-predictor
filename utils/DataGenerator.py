@@ -1,15 +1,20 @@
 import numpy as np
+from typing import Iterable
 from collections import Counter
 
 class DataGenerator():
-    def __init__(self, tokenized_documents, vocabulary=None):
+    def __init__(self, tokenized_documents: Iterable, vocabulary=None):
+        """
+        Class that allows to create the desired dataset from set of documents.
+        """
         self.documents = tokenized_documents
-        
+
         if vocabulary is not None:
             self.vocabulary = vocabulary
 
     def create_vocabulary(self, min_count=1, extra_tokens=[]) -> list:
-        """ Return and creates an attribute vocabulary, which is a list of unique words that occur in the documents.
+        """ 
+        Return and creates an attribute vocabulary, which is a list of unique words that occur in the documents.
         Params:
         min_count - minimum occurrence number to be included in the vocabulary
         extra_tokens - extra tokens that we want to add to the vocabulary e.g. EOF token
@@ -27,7 +32,8 @@ class DataGenerator():
     
     
     def create_dataset(self, previous_words_considered=3):
-        """ Returns tuple with two lists. First words (previous_words_considered determine how many) and in the second the following word
+        """ 
+        Returns tuple with two lists. First words (previous_words_considered determine how many) and in the second the following word
         """
         X_words = []
         y_words = []
@@ -52,8 +58,11 @@ class DataGenerator():
         return (X_words, y_words)
     
 
-    def vectorize(self, X_words, y_words, word_vectorizer, input_size):
-        
+    def vectorize(self, X_words, word_vectorizer, input_size):
+        """ 
+        Converts a 2D list of tokens into a 2D array of size where each row is a concatenation of
+        given tokens, described by input_size = previous_words_considered * vector_size (see config.py).
+        """
         X = np.zeros((len(X_words), input_size))
 
         for index, x in enumerate(X_words):
