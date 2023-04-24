@@ -3,7 +3,7 @@ Inspired by the iPhone word predictor I am trying to recreate such a language mo
 <img src="images/iphone-texting-support.jpg" alt=inspiration width="50%" height="50%">
 
 ## Dataset
-Both the Word2vec and neural network are trained on the famous [dataset](http://ai.stanford.edu/~amaas/data/sentiment/) of movie reviews.
+Both the Word2vec and the feed forward neural network are trained on the famous [dataset](http://ai.stanford.edu/~amaas/data/sentiment/) of movie reviews.
 
 ## Architecture
 <img src="images/pipeline.png" alt=pipeline width="100%" height="100%">
