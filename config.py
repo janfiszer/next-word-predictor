@@ -2,7 +2,7 @@
 SEED = 42
 
 # vocabulary
-VOCAB_MIN_COUNT = 20
+VOCAB_MIN_COUNT = 10
 
 # word2vec parameters
 VECTOR_SIZE = 200

@@ -1,7 +1,7 @@
 # essentials
 import numpy as np
 import pandas as pd
-import os 
+import os
 import pickle
 
 # dense NN
@@ -21,7 +21,8 @@ def create_model_dir():
     try:
         os.makedirs(config.NN_MODEL_DIR)
     except FileExistsError:
-        print(f"WARNING: You will may overwrite your models, because directory \"{config.NN_MODEL_DIR}\" already exists.")
+        print(
+            f"WARNING: You will may overwrite your models, because directory \"{config.NN_MODEL_DIR}\" already exists.\n")
 
 
 def load_data(small_data=True):
@@ -53,6 +54,12 @@ def create_dataset(documents, word_vectorizer):
     data_generator.create_vocabulary(min_count=config.VOCAB_MIN_COUNT, extra_tokens=[config.END_TOKEN])
 
     vocabulary_size = len(data_generator.vocabulary)
+
+    # saving the vocabulary
+    # since VOCAB_MIN_COUNT is on of the parameters on which the performance relies
+    # we have to save the vocabulary for each model
+    with open(os.path.join(config.NN_MODEL_DIR, "vocabulary.pkl"), "wb") as file:
+        pickle.dump(data_generator.vocabulary, file)
 
     X_words, y_words = data_generator.create_dataset(previous_words_considered=config.PREVIOUS_WORDS_CONSIDERED)
     X = data_generator.vectorize(X_words, word_vectorizer=word_vectorizer, input_size=config.INPUT_SIZE)
@@ -99,11 +106,11 @@ def train(model, X_train, y_train):
     # patience 10% of the total number of epochs
     # start_from_epochs 5% of the total number of epochs
     early_stopping = tf.keras.callbacks.EarlyStopping(monitor="val_loss",
-                                                    patience=int(config.EPOCHS*0.10), 
-                                                    start_from_epoch=(config.EPOCHS*0.05),
-                                                    min_delta=0.001,
-                                                    restore_best_weights=True,
-                                                    verbose=1) 
+                                                      patience=int(config.EPOCHS * 0.10),
+                                                      start_from_epoch=(config.EPOCHS * 0.05),
+                                                      min_delta=0.001,
+                                                      restore_best_weights=True,
+                                                      verbose=1)
 
     training = model.fit(X_train, y_train,
                          validation_split=0.1,
