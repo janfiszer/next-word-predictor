@@ -29,9 +29,10 @@ PREDICTED:
                      movies: 79%
 ``` 
 
- TODO:
+### TODO:
 - [ ] RNN instead of FNN
 - [ ] Different word embedding (BERT) 
+- [ ] More detailed architecture instead of pipeline
 
 
 More coming soon...
