@@ -33,6 +33,7 @@ PREDICTED:
 - [ ] RNN instead of FNN
 - [ ] Different word embedding (BERT) 
 - [ ] More detailed architecture instead of pipeline    
+- [ ] DataGenerator improvement allowing to load documents to memory by batches
 
 
 More coming soon...
