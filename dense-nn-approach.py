@@ -71,7 +71,6 @@ def create_dataset(documents, word_vectorizer):
     return X, y, vocabulary_size
 
 
-
 def build_model(vocabulary_size):
     # Dense NN model
     model = Sequential()
@@ -121,6 +120,7 @@ def train(model, X_train, y_train):
 def save(model, X_test, y_test):
     loss, acc = model.evaluate(X_test, y_test)
     acc = int(acc * 100)
+    loss = "{:.2f}".format(loss)
 
     model_filename = f"model-acc{acc}-loss{loss}.h5"
     model_filepath = os.path.join(config.NN_MODEL_DIR, model_filename)
@@ -143,7 +143,7 @@ def main():
     print("LOADING DATA AND MODELS")
 
     reviews_df = load_data()
-    word2vec = load_word2vec("models/word2vecs/word2vec-win7-vec200-min20.pkl")
+    word2vec = load_word2vec("models/word2vecs/wholedataset-win7-vec200-min20.pkl")
 
     print_gap()
 
@@ -161,7 +161,7 @@ def main():
 
     model = build_model(vocabulary_size)
     train(model, X_train, y_train)
-    
+
     print_gap()
 
     # saving model
