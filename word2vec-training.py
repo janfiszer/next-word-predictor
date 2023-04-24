@@ -14,9 +14,9 @@ word2vec = Word2Vec(reviews_df.tokenized,
                     vector_size=config.VECTOR_SIZE)
 
 
-word2vec_filepath = os.path.join(f"{config.WORD2VEC_DIR}/whole-dataset-win7-vec200-min20.pkl")
-
 # saving word2vec model
+word2vec_filepath = f"{config.WORD2VEC_DIR}/whole-dataset-win7-vec200-min20.pkl"
+
 with open(word2vec_filepath, 'wb') as file:
     pickle.dump(word2vec, file)
 

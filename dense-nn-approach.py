@@ -16,22 +16,21 @@ from sklearn.model_selection import train_test_split
 import config
 from utils.DataGenerator import DataGenerator
 
+
 def create_model_dir():
     try:
         os.makedirs(config.NN_MODEL_DIR)
     except FileExistsError:
         print(f"WARNING: You will may overwrite your models, because directory \"{config.NN_MODEL_DIR}\" already exists.")
 
-# Loading the model
+
 def load_data(small_data=True):
     # Loading the data
 
     if small_data:
         data_path = "data/reviews_cleaned_sample.csv"
-        vocabulary_filename = "vocabulary_small.pkl"
     else:
         data_path = "data/reviews_cleaned.csv"
-        vocabulary_filename = "vocabulary.pkl"
 
     reviews_df = pd.read_csv(data_path, converters={'tokenized': pd.eval})
     return reviews_df
@@ -143,7 +142,7 @@ def main():
     print("LOADING DATA AND MODELS")
 
     reviews_df = load_data()
-    word2vec = load_word2vec("models/word2vecs/wholedataset-win7-vec200-min20.pkl")
+    word2vec = load_word2vec("models/word2vecs/whole-dataset-win7-vec200-min20.pkl")
 
     print_gap()
 
