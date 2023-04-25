@@ -2,6 +2,8 @@ import numpy as np
 from typing import Iterable
 from collections import Counter
 
+from utils.exceptions.NotInVocabularyException import NotInVocabularyException
+
 class DataGenerator():
     def __init__(self, tokenized_documents: Iterable, vocabulary=None):
         """
@@ -51,9 +53,6 @@ class DataGenerator():
                         X_words.append(tokenized_review[index-previous_words_considered: index])
                         y_words.append(tokenized_review[index])
 
-                    # TODO: do the exception!
-                    # else:
-                    #     raise 
 
         return (X_words, y_words)
     
@@ -68,14 +67,19 @@ class DataGenerator():
         for index, x in enumerate(X_words):
             numpy_x = np.array([])
             for word in x:
-                numpy_x = np.append(numpy_x, word_vectorizer.wv.get_vector(word))
+                try:
+                    numpy_x = np.append(numpy_x, word_vectorizer.wv.get_vector(word))
+                    
+                except KeyError:
+                    raise NotInVocabularyException
 
             X[index, ...]  = numpy_x
 
         return X
             
     def belong_to_vocabulary(self, tokens: list):
-        """ Returns the first not belonging token in the vocabulary
+        """ 
+        Returns the first not belonging token in the vocabulary
         """
         for token in tokens:
             if not token in self.vocabulary:
