@@ -3,11 +3,12 @@ import numpy as np
 import pandas as pd
 import os
 import pickle
+from architectures import build_fnn, build_rnn
 
 # dense NN
 import tensorflow as tf
 from keras.models import Sequential
-from keras.layers import Dense, Input, Dropout
+from keras.layers import Dense, Input, Dropout, LSTM
 
 # train test split 
 from sklearn.model_selection import train_test_split
@@ -17,12 +18,12 @@ import config
 from utils.DataGenerator import DataGenerator
 
 
-def create_model_dir():
+def create_model_dir(directory_filepath):
     try:
-        os.makedirs(config.NN_MODEL_DIR)
+        os.makedirs(directory_filepath)
     except FileExistsError:
         print(
-            f"WARNING: You will may overwrite your models, because directory \"{config.NN_MODEL_DIR}\" already exists.\n")
+            f"WARNING: You will may overwrite your trained_models, because directory \"{directory_filepath}\" already exists.\n")
 
 
 def load_data(small_data=True):
@@ -58,11 +59,13 @@ def create_dataset(documents, word_vectorizer):
     # saving the vocabulary
     # since VOCAB_MIN_COUNT is on of the parameters on which the performance relies
     # we have to save the vocabulary for each model
-    with open(os.path.join(config.NN_MODEL_DIR, "vocabulary.pkl"), "wb") as file:
+    with open(os.path.join(config.MODEL_DIR, "vocabulary.pkl"), "wb") as file:
         pickle.dump(data_generator.vocabulary, file)
 
     X_words, y_words = data_generator.create_dataset(previous_words_considered=config.PREVIOUS_WORDS_CONSIDERED)
-    X = data_generator.vectorize(X_words, word_vectorizer=word_vectorizer, input_size=config.INPUT_SIZE)
+    X = data_generator.vectorize(X_words,
+                                 word_vectorizer=word_vectorizer,
+                                 input_size=(config.PREVIOUS_WORDS_CONSIDERED, config.VECTOR_SIZE))
 
     # one hotting the labels
     label_to_index = {word: index for index, word in enumerate(data_generator.vocabulary)}
@@ -77,23 +80,23 @@ def create_dataset(documents, word_vectorizer):
     return X, y, vocabulary_size
 
 
-def build_model(vocabulary_size):
-    # Dense NN model
-    model = Sequential()
+# def build_model(vocabulary_size):
+#     # Dense NN model
+#     model = Sequential()
 
-    model.add(Input(config.INPUT_SIZE))
-    model.add(Dense(1024, activation="relu"))
-    model.add(Dense(512, activation="relu"))
-    model.add(Dropout(0.5))
-    model.add(Dense(256, activation="relu"))
-    model.add(Dropout(0.5))
-    model.add(Dense(512, activation="relu"))
-    model.add(Dense(vocabulary_size, activation="sigmoid"))
+#     model.add(Input(config.VECTOR_SIZE))
+#     model.add(Dense(1024, activation="relu"))
+#     model.add(Dense(512, activation="relu"))
+#     model.add(Dropout(0.5))
+#     model.add(Dense(256, activation="relu"))
+#     model.add(Dropout(0.5))
+#     model.add(Dense(512, activation="relu"))
+#     model.add(Dense(vocabulary_size, activation="sigmoid"))
 
-    model.build()
-    model.summary()
+#     model.build()
+#     model.summary()
 
-    return model
+#     return model
 
 
 def train(model, X_train, y_train):
@@ -119,7 +122,7 @@ def train(model, X_train, y_train):
                          callbacks=[early_stopping])
 
     # saving training logs
-    with open(os.path.join(config.NN_MODEL_DIR, "training_logs.pkl"), "wb") as file:
+    with open(os.path.join(config.MODEL_DIR, "training_logs.pkl"), "wb") as file:
         return pickle.dump(training, file)
 
 
@@ -129,7 +132,7 @@ def save(model, X_test, y_test):
     loss = "{:.2f}".format(loss)
 
     model_filename = f"model-acc{acc}-loss{loss}.h5"
-    model_filepath = os.path.join(config.NN_MODEL_DIR, model_filename)
+    model_filepath = os.path.join(config.MODEL_DIR, model_filename)
     model.save(model_filepath)
 
     print("Model successfully saved to file \"{}\"".format(model_filepath))
@@ -143,13 +146,13 @@ def print_gap():
 
 def main():
     # creating model directory
-    create_model_dir()
+    create_model_dir(config.MODEL_DIR)
 
-    # loading the data and models
+    # loading the data and trained_models
     print("LOADING DATA AND MODELS")
 
     reviews_df = load_data()
-    word2vec = load_word2vec("models/word2vecs/whole-dataset-win7-vec200-min20.pkl")
+    word2vec = load_word2vec("trained_models/word2vecs/whole-dataset-win7-vec200-min20.pkl")
 
     print_gap()
 
@@ -165,7 +168,11 @@ def main():
     # training model
     print("TRAINING MODEL")
 
-    model = build_model(vocabulary_size)
+    if config.NN_TYPE == config.NeuralNetworkArchitectureType.RNN:
+        model = build_rnn(vocabulary_size)
+    if config.NN_TYPE == config.NeuralNetworkArchitectureType.FNN:
+        model = build_fnn
+        
     train(model, X_train, y_train)
 
     print_gap()
