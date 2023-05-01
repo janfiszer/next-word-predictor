@@ -34,6 +34,7 @@ PREDICTED:
 - [ ] Different word embedding (BERT) 
 - [ ] More detailed architecture instead of pipeline    
 - [ ] DataGenerator improvement allowing to load documents to memory by batches
+- [ ] Add tqdm for data loading process
 
 
 More coming soon...
